@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Downloader</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+    }
+
+    .container {
+      width: 80%;
+      max-width: 400px;
+      margin: 50px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+
+    input {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: calc(100% - 20px);
+      background-color: #999999;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    button:hover {
+      background-color: #666666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <input type="url" placeholder="http://www.example.com" />
+    
+    <!-- Mirror Download Buttons -->
+    <button type="button" onclick="downloadFileMirror1()">Mirror Download 1</button>
+    <button type="button" onclick="downloadFileMirror2()">Mirror Download 2</button>
+    <button type="button" onclick="downloadFileMirror3()">Mirror Download 3</button>
+
+    <!-- Alternative Download Buttons -->
+    <button type="button" onclick="downloadFileAlternative1()">Alternative Download 1</button>
+    <button type="button" onclick="downloadFileAlternative2()">Alternative Download 2</button>
+    <button type="button" onclick="downloadFileAlternative3()">Alternative Download 3</button>
+    
+    <!-- Original Download Button -->
+    <button type="button" onclick="downloadFileOriginal()">Original Download</button>
+  </div>
+
+  <script>
+    const urlInput = document.querySelector("input");
+
+    // Original Download
+    function downloadFileOriginal() {
+      downloadFile(urlInput.value);
+    }
+
+    // Mirror Downloads
+    function downloadFileMirror1() {
+      // Use window.location.href
+      window.location.href = urlInput.value;
+    }
+
+    function downloadFileMirror2() {
+      // Use window.open
+      window.open(urlInput.value, '_blank');
+    }
+
+    function downloadFileMirror3() {
+      // Use form submission
+      const form = document.createElement('form');
+      form.action = urlInput.value;
+      form.method = 'GET';
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    // Alternative Downloads
+    function downloadFileAlternative1() {
+      // Use fetch API
+      fetch(urlInput.value)
+        .then(response => response.blob())
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = urlInput.value.substring(urlInput.value.lastIndexOf('/') + 1);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        });
+    }
+
+    function downloadFileAlternative2() {
+      // Use iframe
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = urlInput.value;
+      document.body.appendChild(iframe);
+    }
+
+    function downloadFileAlternative3() {
+      // Use navigator.sendBeacon
+      navigator.sendBeacon(urlInput.value);
+    }
+
+    // Common download function
+    function downloadFile(url) {
+      // Use XMLHttpRequest and Blobs
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.responseType = "blob";
+      xhr.onload = function() {
+        const blob = new Blob([xhr.response]);
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = url.substring(url.lastIndexOf('/') + 1);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      };
+      xhr.send();
+    }
+  </script>
+</body>
+</html>
